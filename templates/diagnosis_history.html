@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>诊断历史</h1>
+    {% if logs %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>日期</th>
+                    <th>处方</th>
+                    <th>诊断结果</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                    <tr>
+                        <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ log.prescription }}</td>
+                        <td>{{ log.diagnosis_result }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>暂无诊断历史记录。</p>
+    {% endif %}
+    <a href="{{ url_for('index') }}" class="btn btn-primary">返回首页</a>
+{% endblock %}

@@ -5,6 +5,7 @@ from config import Config
 from models import db, User
 from auth import auth as auth_blueprint
 from admin import admin as admin_blueprint
+from main import main as main_blueprint
 from diagnosis import diagnosis as diagnosis_blueprint
 import logging
 
@@ -19,6 +20,8 @@ login_manager.login_view = 'auth.login'
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(admin_blueprint)
 app.register_blueprint(diagnosis_blueprint)
+app.register_blueprint(main_blueprint)
+
 
 @login_manager.user_loader
 def load_user(user_id):

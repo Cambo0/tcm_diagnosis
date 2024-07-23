@@ -62,3 +62,30 @@ def add_association():
             flash('中药或疾病不存在，请先添加。')
         return redirect(url_for('admin.admin_dashboard'))
     return render_template('admin/add_association.html', form=form)
+
+@admin.route('/manage_herbs')
+@login_required
+def manage_herbs():
+    herbs = Herb.query.all()
+    return render_template('admin/manage_herbs.html', herbs=herbs)
+
+@admin.route('/edit_herb/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_herb(id):
+    herb = Herb.query.get_or_404(id)
+    form = AddHerbForm(obj=herb)
+    if form.validate_on_submit():
+        herb.name = form.name.data
+        db.session.commit()
+        flash('中药更新成功')
+        return redirect(url_for('admin.manage_herbs'))
+    return render_template('admin/edit_herb.html', form=form)
+
+@admin.route('/delete_herb/<int:id>')
+@login_required
+def delete_herb(id):
+    herb = Herb.query.get_or_404(id)
+    db.session.delete(herb)
+    db.session.commit()
+    flash('中药删除成功')
+    return redirect(url_for('admin.manage_herbs'))

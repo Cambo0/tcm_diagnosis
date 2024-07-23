@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>管理中药</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>名称</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for herb in herbs %}
+            <tr>
+                <td>{{ herb.id }}</td>
+                <td>{{ herb.name }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_herb', id=herb.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                    <a href="{{ url_for('admin.delete_herb', id=herb.id) }}" class="btn btn-sm btn-danger">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('admin.add_herb') }}" class="btn btn-success">添加新中药</a>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>管理疾病</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>名称</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for diseases in diseases %}
+            <tr>
+                <td>{{ diseases.id }}</td>
+                <td>{{ diseases.name }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_diseases', id=diseases.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                    <a href="{{ url_for('admin.delete_diseases', id=diseases.id) }}" class="btn btn-sm btn-danger">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('admin.add_diseases') }}" class="btn btn-success">添加新疾病</a>
+{% endblock %}

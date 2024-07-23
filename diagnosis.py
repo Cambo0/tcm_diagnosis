@@ -1,24 +1,32 @@
+import plotly.graph_objs as go
+import plotly.utils
+import json
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required, current_user
 from models import db, Herb, Disease, HerbDiseaseAssociation, DiagnosisLog
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
 import numpy as np
+import jieba
 
 diagnosis = Blueprint('diagnosis', __name__)
 
 @diagnosis.route('/diagnose', methods=['POST'])
 @login_required
 def diagnose():
-    prescription = request.form['prescription'].split(',')
+    prescription = request.form['prescription']
+    
+    # 使用jieba进行分词
+    words = jieba.cut(prescription)
+    herbs = [word for word in words if Herb.query.filter_by(name=word).first()]
     
     # 获取所有中药和疾病
-    herbs = Herb.query.all()
+    all_herbs = Herb.query.all()
     diseases = Disease.query.all()
     
     # 创建特征矩阵
     herb_encoder = LabelEncoder()
-    herb_encoder.fit([herb.name for herb in herbs])
+    herb_encoder.fit([herb.name for herb in all_herbs])
     
     disease_encoder = LabelEncoder()
     disease_encoder.fit([disease.name for disease in diseases])
@@ -26,7 +34,7 @@ def diagnose():
     # 准备训练数据
     X = []
     y = []
-    for herb in herbs:
+    for herb in all_herbs:
         associations = HerbDiseaseAssociation.query.filter_by(herb_id=herb.id).all()
         for association in associations:
             disease = Disease.query.get(association.disease_id)
@@ -41,7 +49,7 @@ def diagnose():
     clf.fit(X, y)
     
     # 预测
-    prescription_encoded = herb_encoder.transform([herb.strip() for herb in prescription])
+    prescription_encoded = herb_encoder.transform(herbs)
     prescription_encoded = prescription_encoded.reshape(-1, 1)
     predictions = clf.predict_proba(prescription_encoded)
     
@@ -56,12 +64,40 @@ def diagnose():
     
     # 记录诊断日志
     log = DiagnosisLog(user_id=current_user.id,
-                       prescription=','.join(prescription),
+                       prescription=prescription,
                        diagnosis_result=str(result))
     db.session.add(log)
     db.session.commit()
     
     return jsonify(result)
+
+@diagnosis.route('/statistics')
+@login_required
+def statistics():
+    # 获取用户的诊断历史
+    logs = DiagnosisLog.query.filter_by(user_id=current_user.id).all()
+    
+    # 统计每种疾病的诊断次数
+    disease_count = {}
+    for log in logs:
+        results = eval(log.diagnosis_result)
+        for result in results:
+            disease = result['name']
+            if disease in disease_count:
+                disease_count[disease] += 1
+            else:
+                disease_count[disease] = 1
+    
+    # 创建饼图
+    labels = list(disease_count.keys())
+    values = list(disease_count.values())
+    
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+    fig.update_layout(title_text="疾病诊断统计")
+    
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    
+    return render_template('statistics.html', graphJSON=graphJSON)
 
 @diagnosis.route('/history')
 @login_required

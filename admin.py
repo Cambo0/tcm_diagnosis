@@ -91,7 +91,7 @@ def edit_herb(id):
         db.session.commit()
         flash('中药更新成功')
         return redirect(url_for('admin.manage_herbs'))
-    return render_template('admin/edit_herb.html', form=form)
+    return render_template('admin/edit_herb.html', form=form, herb=herb)
 
 @admin.route('/delete_herb/<int:id>')
 @login_required
@@ -104,7 +104,7 @@ def delete_herb(id):
 
 @admin.route('/edit_disease/<int:id>', methods=['GET', 'POST'])
 @login_required
-def edit_diseases(id):
+def edit_disease(id):
     disease = Disease.query.get_or_404(id)
     form = AddDiseaseForm(obj=disease)
     if form.validate_on_submit():
@@ -112,7 +112,7 @@ def edit_diseases(id):
         db.session.commit()
         flash('疾病更新成功')
         return redirect(url_for('admin.manage_diseases'))
-    return render_template('admin/edit_diseases.html', form=form)
+    return render_template('admin/edit_disease.html', form=form, disease=disease)
 
 @admin.route('/delete_disease/<int:id>')
 @login_required
@@ -132,18 +132,16 @@ def edit_association(id):
         herb = Herb.query.filter_by(name=form.herb.data).first()
         disease = Disease.query.filter_by(name=form.disease.data).first()
         if herb and disease:
-            association.herb_id = herb.id
-            association.disease_id = disease.id
+            association.herb = herb
+            association.disease = disease
             db.session.commit()
             flash('关联更新成功')
             return redirect(url_for('admin.manage_associations'))
         else:
             flash('中药或疾病不存在，请先添加。')
     else:
-        herb = Herb.query.get(association.herb_id)
-        disease = Disease.query.get(association.disease_id)
-        form.herb.data = herb.name if herb else ''
-        form.disease.data = disease.name if disease else ''
+        form.herb.data = association.herb.name
+        form.disease.data = association.disease.name
     return render_template('admin/edit_association.html', form=form, association=association)
 
 @admin.route('/delete_association/<int:id>')

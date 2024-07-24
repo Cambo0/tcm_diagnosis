@@ -7,6 +7,7 @@
             <tr>
                 <th>ID</th>
                 <th>名称</th>
+                <th>关联疾病数量</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -15,6 +16,7 @@
             <tr>
                 <td>{{ herb.id }}</td>
                 <td>{{ herb.name }}</td>
+                <td>{{ herb.diseases|length }}</td>
                 <td>
                     <a href="{{ url_for('admin.edit_herb', id=herb.id) }}" class="btn btn-sm btn-primary">编辑</a>
                     <a href="{{ url_for('admin.delete_herb', id=herb.id) }}" class="btn btn-sm btn-danger">删除</a>

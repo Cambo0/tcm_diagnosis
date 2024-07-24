@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import db, Herb, Disease, HerbDiseaseAssociation
-from forms import AddHerbForm, AddDiseaseForm, AddAssociationForm
+from forms import AddHerbForm, AddDiseaseForm, AddAssociationForm, BulkAddHerbForm, BulkAddDiseaseForm
 
 admin = Blueprint('admin', __name__)
 
@@ -143,3 +143,55 @@ def delete_association(id):
     db.session.commit()
     flash('关联删除成功')
     return redirect(url_for('admin.manage_associations'))
+
+@admin.route('/admin/bulk_add_herbs', methods=['GET', 'POST'])
+@login_required
+def bulk_add_herbs():
+    if not current_user.is_admin:
+        flash('您没有权限访问此页面。')
+        return redirect(url_for('main.index'))
+    form = BulkAddHerbForm()
+    if form.validate_on_submit():
+        herbs = form.herbs.data.split('\n')
+        added_count = 0
+        skipped_count = 0
+        for herb_name in herbs:
+            herb_name = herb_name.strip()
+            if herb_name:
+                existing_herb = Herb.query.filter_by(name=herb_name).first()
+                if existing_herb:
+                    skipped_count += 1
+                else:
+                    herb = Herb(name=herb_name)
+                    db.session.add(herb)
+                    added_count += 1
+        db.session.commit()
+        flash(f'中药批量添加完成！成功添加 {added_count} 个，跳过 {skipped_count} 个已存在的中药。')
+        return redirect(url_for('admin.admin_dashboard'))
+    return render_template('admin/bulk_add_herbs.html', form=form)
+
+@admin.route('/admin/bulk_add_diseases', methods=['GET', 'POST'])
+@login_required
+def bulk_add_diseases():
+    if not current_user.is_admin:
+        flash('您没有权限访问此页面。')
+        return redirect(url_for('main.index'))
+    form = BulkAddDiseaseForm()
+    if form.validate_on_submit():
+        diseases = form.diseases.data.split('\n')
+        added_count = 0
+        skipped_count = 0
+        for disease_name in diseases:
+            disease_name = disease_name.strip()
+            if disease_name:
+                existing_disease = Disease.query.filter_by(name=disease_name).first()
+                if existing_disease:
+                    skipped_count += 1
+                else:
+                    disease = Disease(name=disease_name)
+                    db.session.add(disease)
+                    added_count += 1
+        db.session.commit()
+        flash(f'疾病批量添加完成！成功添加 {added_count} 个，跳过 {skipped_count} 个已存在的疾病。')
+        return redirect(url_for('admin.admin_dashboard'))
+    return render_template('admin/bulk_add_diseases.html', form=form)

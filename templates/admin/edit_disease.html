@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>编辑疾病</h1>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.name.label }}
+        {{ form.name(class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-primary">更新</button>
+</form>
+{% endblock %}

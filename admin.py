@@ -102,7 +102,7 @@ def delete_herb(id):
     flash('中药删除成功')
     return redirect(url_for('admin.manage_herbs'))
 
-@admin.route('/edit_diseases/<int:id>', methods=['GET', 'POST'])
+@admin.route('/edit_disease/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_diseases(id):
     disease = Disease.query.get_or_404(id)
@@ -114,7 +114,7 @@ def edit_diseases(id):
         return redirect(url_for('admin.manage_diseases'))
     return render_template('admin/edit_diseases.html', form=form)
 
-@admin.route('/delete_diseases/<int:id>')
+@admin.route('/delete_disease/<int:id>')
 @login_required
 def delete_diseases(id):
     disease = Disease.query.get_or_404(id)

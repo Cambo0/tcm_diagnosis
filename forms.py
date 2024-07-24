@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from models import User
 
@@ -38,3 +38,11 @@ class AddAssociationForm(FlaskForm):
     herb = StringField('中药名称', validators=[DataRequired()])
     disease = StringField('疾病名称', validators=[DataRequired()])
     submit = SubmitField('添加关联')
+
+class BulkAddHerbForm(FlaskForm):
+    herbs = TextAreaField('中药名称（每行一个）', validators=[DataRequired()])
+    submit = SubmitField('批量添加')
+
+class BulkAddDiseaseForm(FlaskForm):
+    diseases = TextAreaField('疾病名称（每行一个）', validators=[DataRequired()])
+    submit = SubmitField('批量添加')

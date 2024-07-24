@@ -72,7 +72,7 @@ def manage_herbs():
 @admin.route('/manage_diseases')
 @login_required
 def manage_diseases():
-    diseases = Herb.query.all()
+    diseases = Disease.query.all()
     return render_template('admin/manage_diseases.html', diseases=diseases)
 
 @admin.route('/manage_associations')

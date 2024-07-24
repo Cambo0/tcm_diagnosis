@@ -33,18 +33,18 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">管理疾病</h5>
-                    <p class="card-text">添加疾病数据库。</p>
-                    <a href="{{ url_for('admin.manage_diseases') }}" class="btn btn-primary">管理疾病</a>
+                    <h5 class="card-title">管理中药</h5>
+                    <p class="card-text">管理中药和数据库。</p>
+                    <a href="{{ url_for('admin.manage_herbs') }}" class="btn btn-primary">管理中药</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">管理中药</h5>
-                    <p class="card-text">管理中药和数据库。</p>
-                    <a href="{{ url_for('admin.manage_herbs') }}" class="btn btn-primary">管理中药</a>
+                    <h5 class="card-title">管理疾病</h5>
+                    <p class="card-text">添加疾病数据库。</p>
+                    <a href="{{ url_for('admin.manage_diseases') }}" class="btn btn-primary">管理疾病</a>
                 </div>
             </div>
         </div>
@@ -59,11 +59,11 @@
         </div>
         <div class="card">
             <h3>批量添加中药</h3>
-            <a href="{{ url_for('admin.bulk_add_herbs') }}" class="btn">批量添加中药</a>
+            <a href="{{ url_for('admin.bulk_add_herbs') }}" class="btn btn-primary">批量添加中药</a>
         </div>
         <div class="card">
             <h3>批量添加疾病</h3>
-            <a href="{{ url_for('admin.bulk_add_diseases') }}" class="btn">批量添加疾病</a>
+            <a href="{{ url_for('admin.bulk_add_diseases') }}" class="btn btn-primary">批量添加疾病</a>
         </div>
     </div>
 {% endblock %}

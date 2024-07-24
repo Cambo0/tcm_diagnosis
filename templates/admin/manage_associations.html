@@ -15,8 +15,20 @@
             {% for association in associations %}
             <tr>
                 <td>{{ association.id }}</td>
-                <td>{{ association.herb.name }}</td>
-                <td>{{ association.disease.name }}</td>
+                <td>
+                    {% if association.herb %}
+                        {{ association.herb.name }}
+                    {% else %}
+                        <span class="text-danger">未关联中药</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if association.disease %}
+                        {{ association.disease.name }}
+                    {% else %}
+                        <span class="text-danger">未关联疾病</span>
+                    {% endif %}
+                </td>
                 <td>
                     <a href="{{ url_for('admin.edit_association', id=association.id) }}" class="btn btn-sm btn-primary">编辑</a>
                     <a href="{{ url_for('admin.delete_association', id=association.id) }}" class="btn btn-sm btn-danger">删除</a>

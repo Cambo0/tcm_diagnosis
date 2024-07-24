@@ -143,8 +143,10 @@ def edit_association(id):
         else:
             flash('中药或疾病不存在，请先添加。')
     else:
-        form.herb.data = association.herb.name
-        form.disease.data = association.disease.name
+        herb = Herb.query.get(association.herb_id)
+        disease = Disease.query.get(association.disease_id)
+        form.herb.data = herb.name if herb else ''
+        form.disease.data = disease.name if disease else ''
     return render_template('admin/edit_association.html', form=form, association=association)
 
 @admin.route('/delete_association/<int:id>')

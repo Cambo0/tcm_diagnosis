@@ -4,8 +4,8 @@ import json
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required, current_user
 from models import db, Herb, Disease, HerbDiseaseAssociation, DiagnosisLog
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import LabelEncoder
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import jieba
 
@@ -22,43 +22,45 @@ def diagnose():
     
     # 获取所有中药和疾病
     all_herbs = Herb.query.all()
-    diseases = Disease.query.all()
+    all_diseases = Disease.query.all()
     
     # 创建特征矩阵
-    herb_encoder = LabelEncoder()
-    herb_encoder.fit([herb.name for herb in all_herbs])
-    
-    disease_encoder = LabelEncoder()
-    disease_encoder.fit([disease.name for disease in diseases])
+    herb_features = np.zeros((len(all_herbs),))
+    for herb in herbs:
+        herb_obj = Herb.query.filter_by(name=herb).first()
+        if herb_obj:
+            herb_index = all_herbs.index(herb_obj)
+            herb_features[herb_index] = 1
     
     # 准备训练数据
     X = []
     y = []
     for herb in all_herbs:
         associations = HerbDiseaseAssociation.query.filter_by(herb_id=herb.id).all()
+        disease_vector = np.zeros((len(all_diseases),))
         for association in associations:
             disease = Disease.query.get(association.disease_id)
-            X.append(herb_encoder.transform([herb.name])[0])
-            y.append(disease_encoder.transform([disease.name])[0])
+            disease_index = all_diseases.index(disease)
+            disease_vector[disease_index] = 1
+        X.append([1 if h == herb else 0 for h in all_herbs])
+        y.append(disease_vector)
     
-    X = np.array(X).reshape(-1, 1)
+    X = np.array(X)
     y = np.array(y)
     
-    # 训练决策树模型
-    clf = DecisionTreeClassifier()
+    # 训练多标签分类器
+    clf = MultiOutputClassifier(RandomForestClassifier(n_estimators=100))
     clf.fit(X, y)
     
     # 预测
-    prescription_encoded = herb_encoder.transform(herbs)
-    prescription_encoded = prescription_encoded.reshape(-1, 1)
-    predictions = clf.predict_proba(prescription_encoded)
+    predictions = clf.predict_proba([herb_features])[0]
     
     # 获取结果
     result = []
-    for i, prob in enumerate(predictions.mean(axis=0)):
-        if prob > 0:
-            disease_name = disease_encoder.inverse_transform([i])[0]
-            result.append({'name': disease_name, 'probability': float(prob)})
+    for i, prob in enumerate(predictions):
+        if prob[1] > 0:  # 只考虑正类的概率
+            disease_name = all_diseases[i].name
+            result.append({'name': disease_name, 'probability': float(prob[1])})
     
     result.sort(key=lambda x: x['probability'], reverse=True)
     

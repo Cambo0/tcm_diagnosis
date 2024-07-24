@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import Config
+from flask_migrate import Migrate
 from models import db, User
 from auth import auth as auth_blueprint
 from admin import admin as admin_blueprint

@@ -69,6 +69,18 @@ def manage_herbs():
     herbs = Herb.query.all()
     return render_template('admin/manage_herbs.html', herbs=herbs)
 
+@admin.route('/manage_diseases')
+@login_required
+def manage_diseases():
+    diseases = Herb.query.all()
+    return render_template('admin/manage_diseases.html', diseases=diseases)
+
+@admin.route('/manage_associations')
+@login_required
+def manage_associations():
+    associations = Herb.query.all()
+    return render_template('admin/manage_associations.html', associations=associations)
+
 @admin.route('/edit_herb/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_herb(id):
@@ -89,3 +101,45 @@ def delete_herb(id):
     db.session.commit()
     flash('中药删除成功')
     return redirect(url_for('admin.manage_herbs'))
+
+@admin.route('/edit_diseases/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_diseases(id):
+    disease = Disease.query.get_or_404(id)
+    form = AddDiseaseForm(obj=disease)
+    if form.validate_on_submit():
+        disease.name = form.name.data
+        db.session.commit()
+        flash('疾病更新成功')
+        return redirect(url_for('admin.manage_diseases'))
+    return render_template('admin/edit_diseases.html', form=form)
+
+@admin.route('/delete_diseases/<int:id>')
+@login_required
+def delete_diseases(id):
+    disease = Disease.query.get_or_404(id)
+    db.session.delete(disease)
+    db.session.commit()
+    flash('疾病删除成功')
+    return redirect(url_for('admin.manage_diseases'))
+
+@admin.route('/edit_association/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_association(id):
+    association = HerbDiseaseAssociation.query.get_or_404(id)
+    form = AddAssociationForm(obj=association)
+    if form.validate_on_submit():
+        association.name = form.name.data
+        db.session.commit()
+        flash('关联更新成功')
+        return redirect(url_for('admin.manage_associations'))
+    return render_template('admin/edit_association.html', form=form)
+
+@admin.route('/delete_association/<int:id>')
+@login_required
+def delete_association(id):
+    association = HerbDiseaseAssociation.query.get_or_404(id)
+    db.session.delete(association)
+    db.session.commit()
+    flash('关联删除成功')
+    return redirect(url_for('admin.manage_associations'))

@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>管理关系</h1>
+    <h1>管理关联</h1>
     <table class="table">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>名称</th>
+                <th>中药</th>
+                <th>疾病</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -14,7 +15,8 @@
             {% for association in associations %}
             <tr>
                 <td>{{ association.id }}</td>
-                <td>{{ association.name }}</td>
+                <td>{{ association.herb.name }}</td>
+                <td>{{ association.disease.name }}</td>
                 <td>
                     <a href="{{ url_for('admin.edit_association', id=association.id) }}" class="btn btn-sm btn-primary">编辑</a>
                     <a href="{{ url_for('admin.delete_association', id=association.id) }}" class="btn btn-sm btn-danger">删除</a>
@@ -23,5 +25,5 @@
             {% endfor %}
         </tbody>
     </table>
-    <a href="{{ url_for('admin.add_association') }}" class="btn btn-success">添加新关系</a>
+    <a href="{{ url_for('admin.add_association') }}" class="btn btn-success">添加新关联</a>
 {% endblock %}

@@ -16,8 +16,8 @@
                 <td>{{ disease.id }}</td>
                 <td>{{ disease.name }}</td>
                 <td>
-                    <a href="{{ url_for('admin.edit_diseases', id=disease.id) }}" class="btn btn-sm btn-primary">编辑</a>
-                    <a href="{{ url_for('admin.delete_diseases', id=disease.id) }}" class="btn btn-sm btn-danger">删除</a>
+                    <a href="{{ url_for('admin.edit_disease', id=disease.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                    <a href="{{ url_for('admin.delete_disease', id=disease.id) }}" class="btn btn-sm btn-danger">删除</a>
                 </td>
             </tr>
             {% endfor %}

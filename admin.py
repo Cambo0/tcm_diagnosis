@@ -78,7 +78,7 @@ def manage_diseases():
 @admin.route('/manage_associations')
 @login_required
 def manage_associations():
-    associations = Herb.query.all()
+    associations = HerbDiseaseAssociation.query.all()
     return render_template('admin/manage_associations.html', associations=associations)
 
 @admin.route('/edit_herb/<int:id>', methods=['GET', 'POST'])
@@ -127,13 +127,22 @@ def delete_diseases(id):
 @login_required
 def edit_association(id):
     association = HerbDiseaseAssociation.query.get_or_404(id)
-    form = AddAssociationForm(obj=association)
+    form = AddAssociationForm()
     if form.validate_on_submit():
-        association.name = form.name.data
-        db.session.commit()
-        flash('关联更新成功')
-        return redirect(url_for('admin.manage_associations'))
-    return render_template('admin/edit_association.html', form=form)
+        herb = Herb.query.filter_by(name=form.herb.data).first()
+        disease = Disease.query.filter_by(name=form.disease.data).first()
+        if herb and disease:
+            association.herb_id = herb.id
+            association.disease_id = disease.id
+            db.session.commit()
+            flash('关联更新成功')
+            return redirect(url_for('admin.manage_associations'))
+        else:
+            flash('中药或疾病不存在，请先添加。')
+    else:
+        form.herb.data = association.herb.name
+        form.disease.data = association.disease.name
+    return render_template('admin/edit_association.html', form=form, association=association)
 
 @admin.route('/delete_association/<int:id>')
 @login_required

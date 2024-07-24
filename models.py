@@ -34,8 +34,8 @@ class HerbDiseaseAssociation(db.Model):
     herb_id = db.Column(db.Integer, db.ForeignKey('herb.id'), nullable=False)
     disease_id = db.Column(db.Integer, db.ForeignKey('disease.id'), nullable=False)
     
-    herb = db.relationship('Herb', back_populates='diseases')
-    disease = db.relationship('Disease', back_populates='herbs')
+    herb = db.relationship('Herb', back_populates='disease_associations')
+    disease = db.relationship('Disease', back_populates='herb_associations')
 
 class DiagnosisLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)

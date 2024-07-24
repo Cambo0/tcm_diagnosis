@@ -11,7 +11,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for association in herbs %}
+            {% for association in associations %}
             <tr>
                 <td>{{ association.id }}</td>
                 <td>{{ association.name }}</td>
@@ -23,5 +23,5 @@
             {% endfor %}
         </tbody>
     </table>
-    <a href="{{ url_for('admin.add_association') }}" class="btn btn-success">添加新中药</a>
+    <a href="{{ url_for('admin.add_association') }}" class="btn btn-success">添加新关系</a>
 {% endblock %}

@@ -78,10 +78,7 @@ def manage_diseases():
 @admin.route('/manage_associations')
 @login_required
 def manage_associations():
-    associations = HerbDiseaseAssociation.query.options(
-        db.joinedload(HerbDiseaseAssociation.herb),
-        db.joinedload(HerbDiseaseAssociation.disease)
-    ).all()
+    associations = HerbDiseaseAssociation.query.all()
     return render_template('admin/manage_associations.html', associations=associations)
 
 @admin.route('/edit_herb/<int:id>', methods=['GET', 'POST'])

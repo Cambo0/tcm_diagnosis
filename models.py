@@ -29,11 +29,13 @@ class Disease(db.Model):
     herbs = db.relationship('Herb', secondary='herb_disease_association', back_populates='diseases')
 
 class HerbDiseaseAssociation(db.Model):
-    __tablename__ = 'herb_disease_association'
     id = db.Column(db.Integer, primary_key=True)
     herb_id = db.Column(db.Integer, db.ForeignKey('herb.id'), nullable=False)
     disease_id = db.Column(db.Integer, db.ForeignKey('disease.id'), nullable=False)
     
+    herb = db.relationship('Herb', backref=db.backref('disease_associations', cascade='all, delete-orphan'))
+    disease = db.relationship('Disease', backref=db.backref('herb_associations', cascade='all, delete-orphan'))
+
 class DiagnosisLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

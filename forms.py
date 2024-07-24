@@ -46,3 +46,8 @@ class BulkAddHerbForm(FlaskForm):
 class BulkAddDiseaseForm(FlaskForm):
     diseases = TextAreaField('疾病名称（每行一个）', validators=[DataRequired()])
     submit = SubmitField('批量添加')
+
+class BulkAddAssociationForm(FlaskForm):
+    herb = StringField('中药名称', validators=[DataRequired()])
+    diseases = TextAreaField('疾病列表（每行一个）', validators=[DataRequired()])
+    submit = SubmitField('批量添加关联')

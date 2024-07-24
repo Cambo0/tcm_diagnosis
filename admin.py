@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import db, Herb, Disease, HerbDiseaseAssociation
-from forms import AddHerbForm, AddDiseaseForm, AddAssociationForm, BulkAddHerbForm, BulkAddDiseaseForm
+from forms import AddHerbForm, AddDiseaseForm, AddAssociationForm, BulkAddHerbForm, BulkAddDiseaseForm, BulkAddAssociationForm
 
 admin = Blueprint('admin', __name__)
 
@@ -206,3 +206,43 @@ def bulk_add_diseases():
         flash(f'疾病批量添加完成！成功添加 {added_count} 个，跳过 {skipped_count} 个已存在的疾病。')
         return redirect(url_for('admin.admin_dashboard'))
     return render_template('admin/bulk_add_diseases.html', form=form)
+
+
+@admin.route('/admin/bulk_add_association', methods=['GET', 'POST'])
+@login_required
+def bulk_add_association():
+    if not current_user.is_admin:
+        flash('您没有权限访问此页面。')
+        return redirect(url_for('main.index'))
+    
+    form = BulkAddAssociationForm()
+    if form.validate_on_submit():
+        herb = Herb.query.filter_by(name=form.herb.data).first()
+        if not herb:
+            flash('中药不存在，请先添加。')
+            return redirect(url_for('admin.bulk_add_association'))
+        
+        diseases = form.diseases.data.split('\n')
+        added_count = 0
+        skipped_count = 0
+        
+        for disease_name in diseases:
+            disease_name = disease_name.strip()
+            if disease_name:
+                disease = Disease.query.filter_by(name=disease_name).first()
+                if disease:
+                    existing_association = HerbDiseaseAssociation.query.filter_by(herb_id=herb.id, disease_id=disease.id).first()
+                    if not existing_association:
+                        association = HerbDiseaseAssociation(herb_id=herb.id, disease_id=disease.id)
+                        db.session.add(association)
+                        added_count += 1
+                    else:
+                        skipped_count += 1
+                else:
+                    flash(f'疾病 "{disease_name}" 不存在，请先添加。')
+        
+        db.session.commit()
+        flash(f'批量添加关联完成：成功添加 {added_count} 个，跳过 {skipped_count} 个已存在的关联。')
+        return redirect(url_for('admin.admin_dashboard'))
+    
+    return render_template('admin/bulk_add_association.html', form=form)
